@@ -1,0 +1,36 @@
+{
+	"name": "alertas2",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^7.0.0",
+		"@sveltejs/kit": "^2.50.2",
+		"@sveltejs/vite-plugin-svelte": "^6.2.4",
+		"@tailwindcss/vite": "^4.1.18",
+		"autoprefixer": "^10.4.24",
+		"daisyui": "^5.5.18",
+		"postcss": "^8.5.6",
+		"svelte": "^5.49.2",
+		"svelte-check": "^4.3.6",
+		"tailwindcss": "^4.1.18",
+		"typescript": "^5.9.3",
+		"vite": "^7.3.1"
+	},
+	"dependencies": {
+		"@fontsource-variable/bricolage-grotesque": "^5.2.10",
+		"@fontsource-variable/inter": "^5.2.8",
+		"bcryptjs": "^3.0.3",
+		"better-sqlite3": "^12.6.2",
+		"nodemailer": "^8.0.1",
+		"stripe": "^20.3.1"
+	}
+}

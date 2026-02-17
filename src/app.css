@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@layer base {
+	:root {
+		--font-sans: "Bricolage Grotesque Variable", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+	}
+
+	html,
+	body {
+		font-family: "Bricolage Grotesque Variable", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+		background-color: white;
+		margin: 0;
+		padding: 0;
+	}
+}
