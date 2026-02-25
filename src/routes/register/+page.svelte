@@ -1,63 +1,12 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 
-	let email = $state('');
-	let password = $state('');
-	let confirmPassword = $state('');
-	let error = $state('');
+	let { form } = $props();
 	let loading = $state(false);
-	let success = $state(false);
 
-	// Get redirect parameter if present
-	$: redirectParam = $page.url.searchParams.get('redirect');
-	$: loginUrl = redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : '/login';
-
-	async function handleSubmit() {
-		error = '';
-
-		// Validation
-		if (!email || !password) {
-			error = 'Email and password are required';
-			return;
-		}
-
-		if (password !== confirmPassword) {
-			error = 'Passwords do not match';
-			return;
-		}
-
-		if (password.length < 6) {
-			error = 'Password must be at least 6 characters';
-			return;
-		}
-
-		loading = true;
-
-		try {
-			const response = await fetch('/api/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ email, password })
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				error = data.error || 'Registration failed';
-				return;
-			}
-
-			// Registration successful, show success message
-			success = true;
-		} catch (err) {
-			error = 'An error occurred. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
+	const redirectParam = $derived($page.url.searchParams.get('redirect'));
+	const loginUrl = $derived(redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : '/login');
 </script>
 
 <div class="min-h-screen bg-white flex items-center justify-center px-5">
@@ -79,7 +28,7 @@
 		</div>
 
 		<!-- Success Message -->
-		{#if success}
+		{#if form?.success}
 			<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
 				<div class="flex items-start gap-3">
 					<svg class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,7 +37,7 @@
 					<div>
 						<h3 class="text-sm font-medium text-green-800">Account created successfully!</h3>
 						<p class="text-xs text-green-700 mt-1">
-							Please check your email <strong>{email}</strong> to verify your account.
+							Please check your email <strong>{form.email}</strong> to verify your account.
 						</p>
 					</div>
 				</div>
@@ -96,82 +45,76 @@
 		{/if}
 
 		<!-- Error Message -->
-		{#if error}
+		{#if form?.error}
 			<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
 				<div class="flex items-start gap-3">
 					<svg class="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
-					<span class="text-sm text-red-800">{error}</span>
+					<span class="text-sm text-red-800">{form.error}</span>
 				</div>
 			</div>
 		{/if}
 
-		<!-- Registration Form -->
-		<form onsubmit={handleSubmit} class="space-y-6">
-			<!-- Email Input -->
-			<div>
-				<label for="email" class="block text-sm font-medium text-gray-900 mb-2">
-					Email address
-				</label>
-				<input
-					id="email"
-					type="email"
-					bind:value={email}
-					class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-colors"
-					placeholder="you@example.com"
-					required
+		{#if !form?.success}
+			<form method="POST" use:enhance={() => {
+				loading = true;
+				return async ({ update }) => {
+					await update();
+					loading = false;
+				};
+			}} class="space-y-6">
+				<div>
+					<label for="email" class="block text-sm font-medium text-gray-900 mb-2">Email address</label>
+					<input
+						id="email"
+						name="email"
+						type="email"
+						class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-colors"
+						placeholder="you@example.com"
+						required
+						disabled={loading}
+					/>
+				</div>
+
+				<div>
+					<label for="password" class="block text-sm font-medium text-gray-900 mb-2">Password</label>
+					<input
+						id="password"
+						name="password"
+						type="password"
+						class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-colors"
+						placeholder="••••••••"
+						required
+						disabled={loading}
+					/>
+				</div>
+
+				<div>
+					<label for="passwordConfirm" class="block text-sm font-medium text-gray-900 mb-2">Confirm Password</label>
+					<input
+						id="passwordConfirm"
+						name="passwordConfirm"
+						type="password"
+						class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-colors"
+						placeholder="••••••••"
+						required
+						disabled={loading}
+					/>
+				</div>
+
+				<button
+					type="submit"
+					class="w-full bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 					disabled={loading}
-				/>
-			</div>
+				>
+					{loading ? 'Creating account...' : 'Create account'}
+				</button>
+			</form>
+		{/if}
 
-			<!-- Password Input -->
-			<div>
-				<label for="password" class="block text-sm font-medium text-gray-900 mb-2">
-					Password
-				</label>
-				<input
-					id="password"
-					type="password"
-					bind:value={password}
-					class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-colors"
-					placeholder="••••••••"
-					required
-					disabled={loading}
-				/>
-			</div>
-
-			<!-- Confirm Password Input -->
-			<div>
-				<label for="confirm-password" class="block text-sm font-medium text-gray-900 mb-2">
-					Confirm Password
-				</label>
-				<input
-					id="confirm-password"
-					type="password"
-					bind:value={confirmPassword}
-					class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-colors"
-					placeholder="••••••••"
-					required
-					disabled={loading}
-				/>
-			</div>
-
-			<!-- Create Account Button -->
-			<button
-				type="submit"
-				class="w-full bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-				disabled={loading}
-			>
-				{loading ? 'Creating account...' : 'Create account'}
-			</button>
-		</form>
-
-		<!-- Back to home -->
 		<div class="mt-8 text-center">
-			<a href="/" class="text-sm text-slate-600 hover:text-gray-900">
-				← Back to home
-			</a>
+			<a href="/" class="text-sm text-slate-600 hover:text-gray-900">← Back to home</a>
 		</div>
 	</div>
 </div>

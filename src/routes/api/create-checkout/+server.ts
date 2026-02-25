@@ -1,29 +1,14 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
-import { getSession, getUserById } from '$lib/server/auth';
-import Stripe from 'stripe';
+import { stripe } from '$lib/server/stripe';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY || '', {
-	apiVersion: '2026-01-28.clover'
-});
-
-export const POST: RequestHandler = async ({ request, cookies }) => {
-	// Get session from cookie
-	const sessionId = cookies.get('session_id');
-	if (!sessionId) {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
 		return json({ error: 'Not authenticated' }, { status: 401 });
 	}
 
-	const session = getSession(sessionId);
-	if (!session) {
-		return json({ error: 'Invalid session' }, { status: 401 });
-	}
-
-	const user = getUserById(session.user_id);
-	if (!user) {
-		return json({ error: 'User not found' }, { status: 404 });
-	}
+	const user = locals.user;
 
 	try {
 		const body = await request.json();
@@ -34,38 +19,27 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		}
 
 		// Get or create Stripe customer
-		let customerId = user.stripe_customer_id;
+		let customerId = user.stripe_customer_id as string | undefined;
 
 		if (!customerId) {
-			// Create a new customer if one doesn't exist
 			const customer = await stripe.customers.create({
 				email: user.email,
-				metadata: {
-					userId: user.id.toString()
-				}
+				metadata: { userId: user.id }
 			});
 			customerId = customer.id;
 
-			// Save customer ID to database
-			const { updateUserSubscription } = await import('$lib/server/auth');
-			updateUserSubscription(user.id, user.subscription_tier, customerId, null, null);
+			await locals.pb.collection('users').update(user.id, {
+				stripe_customer_id: customerId
+			});
 		}
 
-		// Create Stripe checkout session with existing customer
 		const checkoutSession = await stripe.checkout.sessions.create({
 			mode: 'subscription',
-			customer: customerId, // Use existing customer instead of email
-			line_items: [
-				{
-					price: priceId,
-					quantity: 1
-				}
-			],
+			customer: customerId,
+			line_items: [{ price: priceId, quantity: 1 }],
 			success_url: `${env.PUBLIC_APP_URL || 'http://localhost:5173'}/dashboard?success=true`,
 			cancel_url: `${env.PUBLIC_APP_URL || 'http://localhost:5173'}?cancelled=true`,
-			metadata: {
-				userId: user.id.toString()
-			}
+			metadata: { userId: user.id }
 		});
 
 		return json({ url: checkoutSession.url });

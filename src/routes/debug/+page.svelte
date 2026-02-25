@@ -15,18 +15,8 @@
 			</div>
 
 			<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-				<h2 class="text-xl font-bold text-gray-900 mb-3">Cookies</h2>
-				<pre class="text-sm text-gray-700 overflow-auto">{JSON.stringify(data.cookies, null, 2)}</pre>
-			</div>
-
-			<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-				<h2 class="text-xl font-bold text-gray-900 mb-3">Session ID</h2>
-				<pre class="text-sm text-gray-700 overflow-auto">{data.sessionId || 'NO SESSION ID'}</pre>
-			</div>
-
-			<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-				<h2 class="text-xl font-bold text-gray-900 mb-3">Session Data</h2>
-				<pre class="text-sm text-gray-700 overflow-auto">{JSON.stringify(data.session, null, 2)}</pre>
+				<h2 class="text-xl font-bold text-gray-900 mb-3">Auth Valid</h2>
+				<pre class="text-sm text-gray-700 overflow-auto">{data.isValid}</pre>
 			</div>
 
 			<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">

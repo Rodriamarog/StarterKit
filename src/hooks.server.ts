@@ -1,24 +1,21 @@
-import { getSession, getUserById } from '$lib/server/auth';
+import PocketBase from 'pocketbase';
+import { PUBLIC_POCKETBASE_URL } from '$env/static/public';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Get session ID from cookie
-	const sessionId = event.cookies.get('session_id');
+	event.locals.pb = new PocketBase(PUBLIC_POCKETBASE_URL);
+	event.locals.pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
 
-	if (sessionId) {
-		const session = getSession(sessionId);
-		if (session) {
-			const user = getUserById(session.user_id);
-			if (user) {
-				// Add user to locals (available in all server-side code)
-				event.locals.user = {
-					id: user.id,
-					email: user.email,
-					subscription_tier: user.subscription_tier
-				};
-			}
+	try {
+		if (event.locals.pb.authStore.isValid) {
+			await event.locals.pb.collection('users').authRefresh();
+			event.locals.user = event.locals.pb.authStore.record;
 		}
+	} catch {
+		event.locals.pb.authStore.clear();
 	}
 
-	return resolve(event);
+	const response = await resolve(event);
+	response.headers.append('set-cookie', event.locals.pb.authStore.exportToCookie());
+	return response;
 };

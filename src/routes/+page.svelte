@@ -32,7 +32,7 @@
 		}
 	];
 
-	const icons = {
+	const icons: Record<string, string> = {
 		"bx:bxs-briefcase": '<path d="M20 6h-3V4c0-1.103-.897-2-2-2H9c-1.103 0-2 .897-2 2v2H4c-1.103 0-2 .897-2 2v11c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V8c0-1.103-.897-2-2-2zm-5-2v2H9V4h6zM8 8h12v3H4V8h4zm-4 9V13h5v2h6v-2h5v6H4v-2z"/>',
 		"bx:bxs-window-alt": '<path d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zm0 2v3H4V5h16zM4 19v-9h16.001l.001 9H4z"/>',
 		"bx:bxs-data": '<path d="M20 6c0-2.168-3.663-4-8-4S4 3.832 4 6v2c0 2.168 3.663 4 8 4s8-1.832 8-4V6zm-8 13c-4.337 0-8-1.832-8-4v3c0 2.168 3.663 4 8 4s8-1.832 8-4v-3c0 2.168-3.663 4-8 4z"/><path d="M20 10c0 2.168-3.663 4-8 4s-8-1.832-8-4v3c0 2.168 3.663 4 8 4s8-1.832 8-4v-3z"/>',
@@ -91,8 +91,8 @@
 	<!-- Hero -->
 	<main class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
 		<div>
-			<h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter text-gray-900">
-				Marketing website done with Astro
+			<h1 class="text-4xl lg:text-5xl xl:text-6xl font-bold lg:tracking-tight xl:tracking-tighter text-gray-900">
+				Recibe una alerta automática en cuanto aparezca una multa en tus placas de Tijuana.
 			</h1>
 			<p class="text-lg mt-4 text-slate-600 max-w-xl">
 				Astroship is a starter template for startups, marketing websites & landing pages. Built with Astro.build and TailwindCSS. You can quickly create any website with this starter.
@@ -115,8 +115,8 @@
 		</div>
 		<div class="py-6 md:order-1 hidden md:block">
 			<img
-				src="/images/hero.png"
-				alt="Astronaut in the air"
+				src="/images/carguy.jpg"
+				alt="Car guy"
 				class="w-full h-auto"
 				loading="eager"
 			/>

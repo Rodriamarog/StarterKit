@@ -18,6 +18,11 @@ Thumbs.db
 !.env.example
 !.env.test
 
+# PocketBase binary & data
+pocketbase
+pocketbase_*
+pb_data/
+
 # Database (contains user data)
 *.db
 *.sqlite
