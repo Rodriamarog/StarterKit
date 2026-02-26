@@ -2,12 +2,11 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import PocketBase from 'pocketbase';
-import { PUBLIC_POCKETBASE_URL } from '$env/static/public';
 import { stripe, webhookSecret } from '$lib/server/stripe';
 import type Stripe from 'stripe';
 
 async function getAdminPb() {
-	const pb = new PocketBase(PUBLIC_POCKETBASE_URL);
+	const pb = new PocketBase(env.PUBLIC_POCKETBASE_URL || 'http://localhost:8090');
 	await pb.collection('_superusers').authWithPassword(env.POCKETBASE_ADMIN_EMAIL || '', env.POCKETBASE_ADMIN_PASSWORD || '');
 	return pb;
 }

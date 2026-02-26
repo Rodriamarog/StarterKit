@@ -6,7 +6,7 @@
 
 	let { data } = $props();
 
-	const tier = data.user.subscription_tier ?? 'free';
+	const tier = $derived(data.user.subscription_tier ?? 'free');
 	const tierVariant: Record<string, 'secondary' | 'default' | 'outline'> = {
 		free: 'secondary',
 		pro: 'default',
@@ -151,11 +151,11 @@
 				<Card.Content>
 					<div class="space-y-4">
 						<div>
-							<label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Email Address</label>
+							<span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Email Address</span>
 							<p class="mt-1 text-sm text-gray-900">{data.user.email}</p>
 						</div>
 						<div>
-							<label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Account ID</label>
+							<span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Account ID</span>
 							<p class="mt-1 text-sm text-gray-900">#{data.user.id}</p>
 						</div>
 					</div>
